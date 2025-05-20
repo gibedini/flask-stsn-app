@@ -1,0 +1,3 @@
+{{ titolo }} {{ nome }} {{ cognome }},
+abbiamo il piacere di confermare la sua iscrizione alla Società Toscana di Scienze Naturali per il 2025.
+La ringraziamo di cuore per il suo contributo alla Società e la attendiamo alle prossime iniziative che organizzeremo.

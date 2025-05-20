@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Archived Members{% endblock %}
+{% block content %}
+<h1 class="mb-4">Archived Members</h1>
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by name or email">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th><th>Surname</th><th>Name</th><th>Email</th><th>Address</th><th>Joined</th><th>Deleted</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for m in members %}
+        <tr>
+            <td>{{ m[0] }}</td>
+            <td>{{ m[1] }}</td>
+            <td>{{ m[2] }}</td>
+            <td>{{ m[3] }}</td>
+            <td>{{ m[4] }}</td>
+            <td>{{ m[5] }}</td>
+            <td>{{ m[6] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="/members" class="btn btn-secondary mt-3">Back to Active Members</a>
+{% endblock %}

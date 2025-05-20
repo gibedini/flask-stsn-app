@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Soci non in regola{% endblock %}
+{% block content %}
+<h2>Soci con quote da saldare</h2>
+{% if messages %}
+  <ul class="list-group">
+    {% for email, message in messages %}
+    <li class="list-group-item">
+      <strong>{{ email }}</strong><br>
+      <pre>{{ message }}</pre>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Tutti i soci sono in regola.</p>
+{% endif %}
+{% endblock %}

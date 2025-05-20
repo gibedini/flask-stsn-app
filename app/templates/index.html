@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+  <h1>Welcome to the Member Management App</h1>
+  <p class="lead">Use the menu above to view or manage members.</p>
+  {% if current_user.is_authenticated %}
+    <a href="{{ url_for('members') }}" class="btn btn-primary mt-3">Go to Members</a>
+  {% else %}
+    <a href="{{ url_for('login') }}" class="btn btn-primary mt-3">Login</a>
+  {% endif %}
+</div>
+{% endblock %}

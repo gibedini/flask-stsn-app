@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Edit Subscription{% endblock %}
+{% block content %}
+<h2>Edit Subscription for Member #{{ member_id }}</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Year</label>
+        <input class="form-control" name="year" type="number" value="{{ subscription[0] }}" required>
+    </div>
+    <div class="mb-3">
+        <label>Fee Paid</label>
+        <select class="form-control" name="fee_paid" required>
+            <option value="yes" {% if subscription[1] == 'yes' %}selected{% endif %}>Yes</option>
+            <option value="no" {% if subscription[1] == 'no' %}selected{% endif %}>No</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a href="/members/{{ member_id }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Member Detail{% endblock %}
+{% block content %}
+<h2>Member Details</h2>
+<p><strong>ID:</strong> {{ member[0] }}</p>
+<p><strong>Name:</strong> {{ member[2] }} {{ member[1] }}</p>
+<p><strong>Email:</strong> {{ member[3] }}</p>
+<p><strong>Address:</strong> {{ member[4] }}</p>
+<p><strong>Year Joined:</strong> {{ member[5] }}</p>
+<p><strong>Stato:</strong> {{ member[6] }}</p>
+<a href="/members/{{ member[0] }}/edit" class="btn btn-warning">Edit</a>
+<a href="/members/{{ member[0] }}/subscriptions/add" class="btn btn-outline-primary">Add Subscription</a>
+<form method="post" action="/members/{{ member[0] }}/delete" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this member?');">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+<hr>
+<h3>Subscriptions</h3>
+<a href="/members/{{ member[0] }}/export" class="btn btn-outline-success mb-3">Download CSV</a>
+<table class="table table-sm table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th style="width: 25px;">Year</th>
+            <th style="width: 25px;">Fee Paid</th>
+            <th style="width: 200px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for sub in subscriptions %}
+        <tr>
+            <td>{{ sub[0] }}</td>
+            <td>{{ sub[1] }}</td>
+			<td>
+    			<a href="/members/{{ member[0] }}/subscriptions/{{ sub[0] }}/edit" class="btn btn-sm btn-warning me-2 d-inline">Edit</a>
+    			<form method="post" action="/members/{{ member[0] }}/subscriptions/{{ sub[0] }}/delete"
+          			class="d-inline"
+          			onsubmit="return confirm('Delete subscription for year {{ sub[0] }}?');">
+        			<button type="submit" class="btn btn-sm btn-danger">Delete</button>
+    			</form>
+			</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h4 class="mt-4">Summary of Paid Years</h4>
+<table class="table table-sm table-bordered w-50">
+    <tr><th>Year</th><th>Payments</th></tr>
+    {% for year, count in summary.items() %}
+        <tr><td>{{ year }}</td><td>{{ count }}</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

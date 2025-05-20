@@ -1,0 +1,5 @@
+{{ titolo }} {{ nome }} {{ cognome }},
+desideriamo informarla che, da una verifica dei nostri registri, la sua posizione associativa risulta non in regola da oltre due anni.
+Pertanto, ai sensi dell’art. 3 dello Statuto della Società Toscana di Scienze Naturali, la sua iscrizione deve considerarsi decaduta per il venir meno dei requisiti di regolarità previsti.
+Qualora ritenesse che vi siano stati versamenti non correttamente registrati, restiamo a sua disposizione per ogni eventuale chiarimento.
+La ringraziamo sentitamente per il contributo dato alla nostra Società nel periodo della sua adesione e, con l’occasione, le porgiamo i nostri più cordiali saluti.

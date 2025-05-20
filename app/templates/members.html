@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}All Members{% endblock %}
+{% block content %}
+<h1 class="mb-4">All Members</h1>
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by name or email">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Surname</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Year Joined</th>
+            <th>Fees OK?</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for member in members %}
+        <tr>
+            <td><a href="/members/{{ member[0] }}">{{ member[0] }}</a></td>
+            <td>{{ member[1] }}</td>
+            <td>{{ member[2] }}</td>
+            <td>{{ member[3] }}</td>
+            <td>{{ member[4] }}</td>
+            <td>{{ member[5] }}</td>
+            <td>
+  				{% if statuses[member[0]] %}
+    				<span class="text-success">✔</span>
+  				{% else %}
+    				<span class="text-danger">✘</span>
+  				{% endif %}
+			</td>
+            <td>{{ member[6] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

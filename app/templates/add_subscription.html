@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add Subscription{% endblock %}
+{% block content %}
+<h2>Add Subscription for Member #{{ member_id }}</h2>
+<form method="post">
+    <div class="mb-3"><input class="form-control" name="year" type="number" value="{{ default_year }}" required></div>
+    <div class="mb-3">
+        <select class="form-control" name="fee_paid" required>
+            <option value="">Select payment status</option>
+            <option value="yes" selected>Yes</option>
+            <option value="no">No</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Add Subscription</button>
+    <a href="/members/{{ member_id }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,7 @@
+{{ titolo }} {{ nome }} {{ cognome }},
+le ricordiamo che la sua ultima quota versata risulta quella relativa all’anno 
+{{ ultimo_anno }}.
+Resta quindi da saldare la quota {{ anno_da_saldare }}, pari a {{ a_debito }} €.
+Le rammentiamo che può provvedere al pagamento MODALITÀ e ci auguriamo di incontrarla
+alle nostre prossime iniziative.
+Cordialmente
