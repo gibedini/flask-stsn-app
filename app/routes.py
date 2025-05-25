@@ -65,16 +65,16 @@ def generate_missing_fees_data():
 
 @app.route("/db-test")
 def db_test():
-try:
-conn = get_connection()
-cur = conn.cursor()
-cur.execute("SELECT 1")
-result = cur.fetchone()
-cur.close()
-conn.close()
-return f"✅ Connessione al database riuscita. Risultato test: {result\[0]}"
-except Exception as e:
-return f"❌ Errore nella connessione al database:<br><pre>{str(e)}</pre>"
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return f"✅ Connessione al database riuscita. Risultato test: {result\[0]}"
+    except Exception as e:
+    return f"❌ Errore nella connessione al database:<br><pre>{str(e)}</pre>"
 
 @app.route("/members")
 @login_required
