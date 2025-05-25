@@ -72,7 +72,7 @@ def db_test():
         result = cur.fetchone()
         cur.close()
         conn.close()
-        return f"✅ Connessione al database riuscita. Risultato test: {result\[0]}"
+        return f"✅ Connessione al database riuscita. Risultato test: {result[0]}"
     except Exception as e:
         return f"❌ Errore nella connessione al database:<br><pre>{str(e)}</pre>"
 
