@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Utenti{% endblock %}
+{% block content %}
+<h2>Utenti registrati</h2>
+<table class="table table-bordered table-sm">
+  <thead class="table-light">
+    <tr><th>ID</th><th>Username</th><th>Admin?</th></tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+        <td>{{ '✔' if user[2] else '✘' }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

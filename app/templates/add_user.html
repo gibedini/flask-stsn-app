@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Aggiungi utente{% endblock %}
+{% block content %}
+<h2>Nuovo utente</h2>
+<form method="post">
+  <div class="mb-3">
+    <label>Username</label>
+    <input class="form-control" name="username" required>
+  </div>
+  <div class="mb-3">
+    <label>Password</label>
+    <input class="form-control" name="password" type="password" required>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
+    <label class="form-check-label" for="is_admin">Amministratore</label>
+  </div>
+  <button class="btn btn-primary mt-3">Crea utente</button>
+</form>
+{% endblock %}

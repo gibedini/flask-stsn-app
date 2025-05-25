@@ -10,6 +10,8 @@ from psycopg2 import IntegrityError
 import csv
 import io
 from datetime import date
+from werkzeug.security import generate_password_hash
+
 
 def generate_missing_fees_data():
     current_year = datetime.now().year
@@ -322,8 +324,45 @@ def delete_member(member_id):
     conn.close()
     return redirect("/members")
     
-    
 from datetime import datetime
+@app.route("/users")
+@login_required
+def list_users():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, is_admin FROM users ORDER BY id")
+    users = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template("users.html", users=users)
+
+
+
+@app.route("/users/add", methods=["GET", "POST"])
+@login_required
+def add_user():
+    if not current_user.is_admin:
+        flash("Solo gli amministratori possono aggiungere utenti", "danger")
+        return redirect(url_for("list_users"))
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        is_admin = "is_admin" in request.form
+
+        password_hash = generate_password_hash(password)
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO users (username, password_hash, is_admin) VALUES (%s, %s, %s)",
+                    (username, password_hash, is_admin))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Utente aggiunto con successo", "success")
+        return redirect(url_for("list_users"))
+
+    return render_template("add_user.html")
+
 
 
 @app.route("/missing_fees")
