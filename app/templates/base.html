@@ -14,6 +14,7 @@
         <li class="nav-item"><a class="nav-link" href="/members/add">Add Member</a></li>
         <li class="nav-item"><a class="nav-link" href="/archived">Archived</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('missing_fees') }}">Quote mancanti</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('list_users') }}">Utenti</a></li>
         {% if current_user.is_authenticated %}
         <li class="nav-item"><a class="nav-link" href="/register">Register User</a></li>
         {% endif %}
