@@ -11,7 +11,6 @@ import csv
 import io
 from datetime import date
 
-
 def generate_missing_fees_data():
     current_year = datetime.now().year
     conn = get_connection()
@@ -62,6 +61,20 @@ def generate_missing_fees_data():
     cur.close()
     conn.close()
     return messages, csv_rows
+
+
+@app.route("/db-test")
+def db_test():
+try:
+conn = get_connection()
+cur = conn.cursor()
+cur.execute("SELECT 1")
+result = cur.fetchone()
+cur.close()
+conn.close()
+return f"✅ Connessione al database riuscita. Risultato test: {result\[0]}"
+except Exception as e:
+return f"❌ Errore nella connessione al database:<br><pre>{str(e)}</pre>"
 
 @app.route("/members")
 @login_required
@@ -154,6 +167,8 @@ def member_detail(member_id):
     conn.close()
 
     return render_template("member_detail.html", member=member, subscriptions=subscriptions, summary=summary)
+
+
  
     
 @app.route("/members/<int:member_id>/edit", methods=["GET", "POST"])
