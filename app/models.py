@@ -2,6 +2,7 @@ import psycopg2
 import os
 
 def get_connection():
+    print("➡️ Connettendo a:", os.getenv("DATABASE_URL") or os.getenv("DB_HOST"))
     return psycopg2.connect(os.getenv("DATABASE_URL"))
 
 from flask_login import UserMixin
