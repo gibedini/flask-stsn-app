@@ -15,6 +15,15 @@
     <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
     <label class="form-check-label" for="is_admin">Amministratore</label>
   </div>
+  <div class="mb-3">
+    <label>Role</label>
+  <select class="form-select" name="role" id="role" required>
+    <option value="admin">Admin</option>
+    <option value="editor">Editor</option>
+    <option value="viewer" selected>Viewer</option>
+  </select>
+  </div>
+  
   <button class="btn btn-primary mt-3">Crea utente</button>
 </form>
 {% endblock %}

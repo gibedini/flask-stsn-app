@@ -8,7 +8,13 @@
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
-<a class="nav-link" href="/members/add" class="btn btn-success mb-3>Add Member</a>
+{% if current_user.is_authenticated %}
+  {% if current_user.role in ['admin', 'editor'] %}
+
+      <a class="btn btn-success mb-3" href="{{ url_for('add_member') }}">Add member</a>
+
+  {% endif %}
+{% endif %}
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
@@ -32,10 +38,10 @@
             <td>{{ member[4] }}</td>
             <td>{{ member[5] }}</td>
             <td>
-  				{% if statuses[member[0]] %}
-    				<span class="text-success">✔</span>
+  				{% if member[6] == "regolare" %}
+    				<span class="text-success">✅</span>
   				{% else %}
-    				<span class="text-danger">✘</span>
+    				<span class="text-danger">❌</span>
   				{% endif %}
 			</td>
             <td>{{ member[6] }}</td>

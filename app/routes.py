@@ -11,6 +11,9 @@ import csv
 import io
 from datetime import date
 from werkzeug.security import generate_password_hash
+from app.decorators import edit_permission_required
+from app.decorators import admin_required
+
 
 
 def generate_missing_fees_data():
@@ -115,6 +118,7 @@ def members():
 
 @app.route("/members/add", methods=["GET", "POST"])
 @login_required
+@edit_permission_required
 def add_member():
     if request.method == "POST":
         surname = request.form["surname"]
@@ -175,6 +179,7 @@ def member_detail(member_id):
     
 @app.route("/members/<int:member_id>/edit", methods=["GET", "POST"])
 @login_required
+@edit_permission_required
 def edit_member(member_id):
     conn = get_connection()
     cur = conn.cursor()
@@ -218,6 +223,7 @@ def edit_member(member_id):
 
 @app.route("/members/<int:member_id>/subscriptions/add", methods=["GET", "POST"])
 @login_required
+@edit_permission_required
 def add_subscription(member_id):
     if request.method == "POST":
         year = request.form["year"]
@@ -245,6 +251,7 @@ def add_subscription(member_id):
 
 @app.route("/members/<int:member_id>/subscriptions/<int:year>/edit", methods=["GET", "POST"])
 @login_required
+@edit_permission_required
 def edit_subscription(member_id, year):
     conn = get_connection()
     cur = conn.cursor()
@@ -285,6 +292,7 @@ def edit_subscription(member_id, year):
 
 @app.route("/members/<int:member_id>/subscriptions/<int:year>/delete", methods=["POST"])
 @login_required
+@edit_permission_required
 def delete_subscription(member_id, year):
     conn = get_connection()
     cur = conn.cursor()
@@ -299,6 +307,7 @@ def delete_subscription(member_id, year):
 
 @app.route("/members/<int:member_id>/delete", methods=["POST"])
 @login_required
+@edit_permission_required
 def delete_member(member_id):
     today = date.today()
     conn = get_connection()
@@ -330,7 +339,7 @@ from datetime import datetime
 def list_users():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, username, is_admin FROM users ORDER BY id")
+    cur.execute("SELECT id, username, is_admin, role FROM users ORDER BY id")
     users = cur.fetchall()
     cur.close()
     conn.close()
@@ -340,6 +349,7 @@ def list_users():
 
 @app.route("/users/add", methods=["GET", "POST"])
 @login_required
+@admin_required
 def add_user():
     if not current_user.is_admin:
         flash("Solo gli amministratori possono aggiungere utenti", "danger")
@@ -350,11 +360,12 @@ def add_user():
         password = request.form["password"]
         is_admin = "is_admin" in request.form
 
-        password_hash = generate_password_hash(password)
+        password_hash = generate_password_hash(password, method="pbkdf2:sha256")
+        role = request.form["role"]
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("INSERT INTO users (username, password_hash, is_admin) VALUES (%s, %s, %s)",
-                    (username, password_hash, is_admin))
+        cur.execute("INSERT INTO users (username, password_hash, is_admin, role) VALUES (%s, %s, %s, %s)",
+                    (username, password_hash, is_admin, role))
         conn.commit()
         cur.close()
         conn.close()
@@ -367,12 +378,14 @@ def add_user():
 
 @app.route("/missing_fees")
 @login_required
+@edit_permission_required
 def missing_fees():
     messages, _ = generate_missing_fees_data()
     return render_template("missing_fees.html", messages=messages)
 
 @app.route("/missing_fees/export")
 @login_required
+@edit_permission_required
 def export_missing_fees():
     _, csv_rows = generate_missing_fees_data()
 

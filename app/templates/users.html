@@ -1,20 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Utenti{% endblock %}
 {% block content %}
-<h2>Utenti registrati</h2>
+<h2>Registered users</h2>
 {% if current_user.is_admin %}
-  <a href="{{ url_for('add_user') }}" class="btn btn-success mb-3">Aggiungi utente</a>
+  <a href="{{ url_for('add_user') }}" class="btn btn-success mb-3">Add user</a>
 {% endif %}
 <table class="table table-bordered table-striped">
-  <thead class="table-light">
-    <tr><th>ID</th><th>Username</th><th>Admin?</th></tr>
+  <thead class="table-dark">
+    <tr><th>ID</th><th>Username</th><th>Admin?</th><th>Role</th></tr>
   </thead>
   <tbody>
     {% for user in users %}
       <tr>
         <td>{{ user[0] }}</td>
         <td>{{ user[1] }}</td>
-        <td>{{ '✔' if user[2] else '✘' }}</td>
+        <td>{{ '✅' if user[2] else '❌' }}</td>
+        <td>{{ user[3] }}</td>
       </tr>
     {% endfor %}
   </tbody>

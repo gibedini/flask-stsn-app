@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Soci non in regola{% endblock %}
 {% block content %}
-<h2>Soci con quote da saldare</h2>
+<h2>Subscription messages</h2>
 {% if messages %}
-<a href="{{ url_for('export_missing_fees') }}" class="btn btn-outline-success mb-3">
-  Scarica CSV
+<a href="{{ url_for('export_missing_fees') }}" class="btn btn-success mb-3">
+  Download CSV
 </a>
   <ul class="list-group">
     {% for email, message in messages %}
