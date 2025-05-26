@@ -9,7 +9,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="/members">Members</a>
-    <div class="collapse navbar-collapse">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+ 
+    <div class="collapse navbar-collapse" id="mainNavbar">
       <ul class="navbar-nav me-auto">
         <!--li class="nav-item"><a class="nav-link" href="/archived">Archived</a></li-->
         <li class="nav-item"><a class="nav-link" href="{{ url_for('missing_fees') }}">Subscription messages</a></li>
