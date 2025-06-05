@@ -61,7 +61,7 @@ def generate_missing_fees_data():
             else:
                 template_name = get_template_by_name("moroso_one")
         else:
-            template_name = get_template_by_name(f"{stato}") 
+            template_name = get_template_by_name(stato) 
 
         context = {
             "titolo": titolo,
@@ -73,7 +73,7 @@ def generate_missing_fees_data():
             "a_debito": amt_owed
         }
 
-        msg = render_template(template_name, **context)
+        msg = render_template_string(template_name, **context)
         messages.append((email, msg))
         csv_rows.append([email, name, surname, titolo, last_paid, start_due, stato, amt_owed, msg])
 
@@ -551,6 +551,35 @@ def create_template():
         flash("Template creato.", "success")
         return redirect(url_for("list_templates"))
     return render_template("create_template.html")
+
+ 
+@app.route("/templates/<int:template_id>/preview")
+@login_required
+def preview_template(template_id):
+    if current_user.role != "admin":
+        flash("Solo gli amministratori possono visualizzare l'anteprima dei template.", "danger")
+        return redirect(url_for("members"))
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT content FROM message_templates WHERE id = %s", (template_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if not row:
+        return "Template non trovato", 404
+
+    template = row[0]
+    context = {
+        "titolo": "Gentile Sig.",
+        "nome": "Mario",
+        "cognome": "Rossi",
+        "ultimo_anno": 2023,
+        "anno_da_saldare": 2024,
+        "stato": "moroso",
+        "a_debito": 70
+    }
+    anteprima = render_template_string(template, **context)
+    return render_template("preview_template.html", anteprima=anteprima)
 
     
 
