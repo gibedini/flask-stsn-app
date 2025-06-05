@@ -28,10 +28,15 @@
        <!-- {% if current_user.is_authenticated %}
         <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
         {% endif %} -->
-        {% if current_user.is_authenticated and current_user.role == 'admin' %}
-  			<li class="nav-item">
-    			<a class="nav-link" href="{{ url_for('list_templates') }}">Templates</a>
-  			</li>
+		{% if current_user.is_authenticated %}
+  			{% if current_user.role == 'admin' %}
+    			<li class="nav-item">
+      				<a class="nav-link" href="{{ url_for('list_templates') }}">Templates</a>
+    			</li>
+    			<li class="nav-item">
+      				<a class="nav-link" href="{{ url_for('anteprima_lettera') }}">Lettere</a>
+    			</li>
+  			{% endif %}
 		{% endif %}
       </ul>
       <ul class="navbar-nav">

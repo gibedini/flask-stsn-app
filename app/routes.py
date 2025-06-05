@@ -581,7 +581,100 @@ def preview_template(template_id):
     anteprima = render_template_string(template, **context)
     return render_template("preview_template.html", anteprima=anteprima)
 
-    
+@app.route("/lettere/anteprima", methods=["GET", "POST"])
+@login_required
+def anteprima_lettera():
+    if current_user.role != "admin":
+        flash("Accesso riservato agli amministratori.", "danger")
+        return redirect(url_for("members"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT name, description FROM message_templates ORDER BY name")
+    templates = cur.fetchall()
+
+    anteprima = None
+    selected = None
+
+    if request.method == "POST":
+        selected = request.form.get("template")
+        cur.execute("SELECT content FROM message_templates WHERE name = %s", (selected,))
+        row = cur.fetchone()
+        if row:
+            template = row[0]
+            context = {
+                "titolo": "Gentile Sig.",
+                "nome": "Giuseppe",
+                "cognome": "Verdi",
+                "stato": "regolare",
+                "a_debito": 0,
+                "anno_da_saldare": 2023,
+                "ultimo_anno": 2022
+            }
+            anteprima = render_template_string(template, **context)
+
+    cur.close()
+    conn.close()
+    return render_template("letter_preview.html", templates=templates, anteprima=anteprima, selected=selected)
+
+@app.route("/lettere/export", methods=["POST"])
+@login_required
+def export_lettere():
+    if current_user.role != "admin":
+        flash("Accesso riservato agli amministratori.", "danger")
+        return redirect(url_for("members"))
+
+    selected = request.form.get("template")
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Recupera template scelto
+    cur.execute("SELECT content FROM message_templates WHERE name = %s", (selected,))
+    row = cur.fetchone()
+    if not row:
+        flash("Template non trovato.", "warning")
+        return redirect(url_for("anteprima_lettera"))
+    template = row[0]
+
+    # Recupera tutti i soci
+    cur.execute("SELECT member_id, surname, name, email, sex FROM members ORDER BY surname")
+    members = cur.fetchall()
+
+    messages = []
+    for m in members:
+        member_id, surname, name, email, sex = m
+        titolo = "Gentile Sig.ra" if sex == "f" else "Gentile Sig."
+
+        cur.execute("SELECT MAX(year) FROM subscriptions WHERE member_id = %s AND fee_paid = 'yes'", (member_id,))
+        last_paid = cur.fetchone()[0] or 2022
+        start_due = last_paid + 1
+
+        context = {
+            "titolo": titolo,
+            "nome": name,
+            "cognome": surname,
+            "stato": "regolare",
+            "ultimo_anno": last_paid,
+            "anno_da_saldare": start_due,
+            "a_debito": 35 * (datetime.now().year - last_paid)
+        }
+        msg = render_template_string(template, **context)
+        messages.append([email, name, surname, msg])
+
+    cur.close()
+    conn.close()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Email", "Nome", "Cognome", "Messaggio"])
+    writer.writerows(messages)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={selected}_lettere.csv"}
+    )
+  
 
 @app.route("/")
 def index():
