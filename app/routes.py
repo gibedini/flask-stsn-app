@@ -9,11 +9,25 @@ from collections import Counter
 from psycopg2 import IntegrityError
 import csv
 import io
-from datetime import date
+from datetime import date, datetime
 from werkzeug.security import generate_password_hash
 from app.decorators import edit_permission_required
 from app.decorators import admin_required
+# from app.database_models import TableName
+# from app.database_session import db
+# import smtp  # email
 
+def get_template_by_name(name):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT content FROM message_templates WHERE name = %s", (name,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row[0] if row else None
+# Esempio d'uso:
+# template = get_template_by_name("moroso_one")
+# msg = render_template_string(template, **context)
 
 
 def generate_missing_fees_data():
@@ -43,11 +57,11 @@ def generate_missing_fees_data():
 
         if stato == "moroso":
             if current_year - last_paid > 1:
-                template_name = "messages/moroso_plus.txt"
+                template_name = get_template_by_name("moroso_plus")  # os.path.join(dir, filename)
             else:
-                template_name = "messages/moroso_one.txt"
+                template_name = get_template_by_name("moroso_one")
         else:
-            template_name = f"messages/{stato}.txt"
+            template_name = get_template_by_name(f"{stato}") 
 
         context = {
             "titolo": titolo,
@@ -80,6 +94,7 @@ def db_test():
         return f"✅ Connessione al database riuscita. Risultato test: {result[0]}"
     except Exception as e:
         return f"❌ Errore nella connessione al database:<br><pre>{str(e)}</pre>"
+
 
 @app.route("/members")
 @login_required
@@ -119,6 +134,27 @@ def members():
 @app.route("/members/add", methods=["GET", "POST"])
 @login_required
 @edit_permission_required
+# class AddMember(qualcosa):
+#    def post(path:MemberPath, body:MemberBody, query:MemberQuery):
+#        pass
+# from pydantic import BaseModel
+# MemberPath(BaseModel):
+#    member_id: int = Field(default=1, description='', pattern='', ge=0)
+
+# class MemberBody(BaseModel):
+#    surname: str
+#    name: str
+#    email: str
+#    street_address: str
+#    year_joined: int
+
+# body.surname
+# try:
+#     db.session.add(body)
+#     db.session.commit()
+# except:
+#    pass
+
 def add_member():
     if request.method == "POST":
         surname = request.form["surname"]
@@ -333,7 +369,6 @@ def delete_member(member_id):
     conn.close()
     return redirect("/members")
     
-from datetime import datetime
 @app.route("/users")
 @login_required
 def list_users():
@@ -375,6 +410,66 @@ def add_user():
     return render_template("add_user.html")
 
 
+@app.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_user(user_id):
+    if not current_user.role == "admin":
+        flash("Solo gli amministratori possono modificare utenti.", "danger")
+        return redirect(url_for("list_users"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        username = request.form["username"]
+        role = request.form["role"]
+        is_admin = "is_admin" in request.form
+
+        cur.execute("""
+            UPDATE users
+            SET username = %s, role = %s, is_admin = %s
+            WHERE id = %s
+        """, (username, role, is_admin, user_id))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Utente aggiornato.", "success")
+        return redirect(url_for("list_users"))
+
+    cur.execute("SELECT id, username, role, is_admin FROM users WHERE id = %s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not user:
+        return "Utente non trovato", 404
+
+    return render_template("edit_user.html", user=user)
+
+
+@app.route("/users/<int:user_id>/delete", methods=["POST"])
+@login_required
+def delete_user(user_id):
+    if not current_user.role == "admin":
+        flash("Solo gli amministratori possono eliminare utenti.", "danger")
+        return redirect(url_for("list_users"))
+        
+    if current_user.id == user_id:
+        flash("Non puoi eliminare te stesso.", "warning")
+        return redirect(url_for("list_users"))   
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    flash("Utente eliminato.", "info")
+    return redirect(url_for("list_users"))
+
+
+
 
 @app.route("/missing_fees")
 @login_required
@@ -399,6 +494,64 @@ def export_missing_fees():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=missing_fees.csv"}
     )
+
+# Route per visualizzare, modificare e creare i template
+@app.route("/templates")
+@login_required
+def list_templates():
+    if current_user.role != "admin":
+        flash("Solo gli amministratori possono modificare i template.", "danger")
+        return redirect(url_for("members"))
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, description FROM message_templates ORDER BY name")
+    templates = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template("list_templates.html", templates=templates)
+
+@app.route("/templates/<int:template_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_template(template_id):
+    if current_user.role != "admin":
+        flash("Solo gli amministratori possono modificare i template.", "danger")
+        return redirect(url_for("members"))
+    conn = get_connection()
+    cur = conn.cursor()
+    if request.method == "POST":
+        content = request.form["content"]
+        cur.execute("UPDATE message_templates SET content = %s WHERE id = %s", (content, template_id))
+        conn.commit()
+        flash("Template aggiornato.", "success")
+        return redirect(url_for("list_templates"))
+    cur.execute("SELECT id, name, description, content FROM message_templates WHERE id = %s", (template_id,))
+    template = cur.fetchone()
+    cur.close()
+    conn.close()
+    return render_template("edit_template.html", template=template)
+
+@app.route("/templates/new", methods=["GET", "POST"])
+@login_required
+def create_template():
+    if current_user.role != "admin":
+        flash("Solo gli amministratori possono creare template.", "danger")
+        return redirect(url_for("members"))
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        content = request.form["content"]
+
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO message_templates (name, description, content) VALUES (%s, %s, %s)",
+                    (name, description, content))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Template creato.", "success")
+        return redirect(url_for("list_templates"))
+    return render_template("create_template.html")
+
     
 
 @app.route("/")

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}New template{% endblock %}
+{% block content %}
+<h2>New template</h2>
+
+<p>Here you may create a new message template. Database fields can be referenced
+in templates by enclosing them in double curly parentheses 
+{{ '{{' }} <em>like this</em> {{ '}}' }}.
+<br>
+Currently the following fields are recognized by the template renderer:
+<div class="narrow-table-left">
+<table class="table table-bordered table-sm">
+	<thead class="table-dark">
+		<tr><td>Field</td><td>Description</td></tr>
+	</thead>
+	<tbody>
+		<tr><td><i>titolo</i></td><td>name prefix, e.g. "Gent.mo Sig." or "Gent.ma Sig.ra"</td></tr>
+		<tr><td><i>nome</i></td><td>first name</td></tr>
+		<tr><td><i>cognome</i></td><td>last name</td></tr>
+		<tr><td><i>ultimo_anno</i></td><td>year of last subscription fee payment</td></tr>
+		<tr><td><i>anno da saldare</i></td><td>first year for which payment is due</td></tr>
+		<tr><td><i>a_debito</i></td><td>amount due, in Euros</td></tr>
+	</tbody>			
+</table>
+</p>
+<p>
+</div>
+<p>So, if you enter {{ '{{' }} titolo {{ '}}' }} in the template, 
+it will be rendered as "Gent.mo Sig." 
+or "Gent.ma Sig.ra" based on member sex.<br>
+To control message formatting, a template can include regular HTML formatting tag. To 
+create a new template, press "New template" below.
+</p>
+
+<form method="post">
+  <div class="mb-3">
+    <label for="name" class="form-label">Internal name</label>
+    <input class="form-control" name="name" id="name" required>
+  </div>
+  <div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <input class="form-control" name="description" id="description">
+  </div>
+  <div class="mb-3">
+    <label for="content" class="form-label">Content</label>
+    <textarea class="form-control" name="content" id="content" rows="10" required></textarea>
+  </div>
+  <button class="btn btn-primary">Create template</button>
+</form>
+{% endblock %}

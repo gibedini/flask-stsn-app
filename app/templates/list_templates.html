@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Message templates{% endblock %}
+{% block content %}
+<h2>Message templates</h2>
+<p>Here you may view stored templates for custom messages. Database fields can be referenced
+in templates by enclosing them in double curly parentheses 
+{{ '{{' }} <em>like this</em> {{ '}}' }}.
+<br>
+Currently the following fields are recognized by the template renderer:
+<div class="narrow-table-left">
+<table class="table table-bordered table-sm">
+	<thead class="table-dark">
+		<tr><td>Field</td><td>Description</td></tr>
+	</thead>
+	<tbody>
+		<tr><td><i>titolo</i></td><td>name prefix, e.g. "Gent.mo Sig." or "Gent.ma Sig.ra"</td></tr>
+		<tr><td><i>nome</i></td><td>first name</td></tr>
+		<tr><td><i>cognome</i></td><td>last name</td></tr>
+		<tr><td><i>ultimo_anno</i></td><td>year of last subscription fee payment</td></tr>
+		<tr><td><i>anno da saldare</i></td><td>first year for which payment is due</td></tr>
+		<tr><td><i>a_debito</i></td><td>amount due, in Euros</td></tr>
+	</tbody>			
+</table>
+</p>
+<p>
+</div>
+<p><p>So, if you enter {{ '{{' }} titolo {{ '}}' }} in the template, 
+it will be rendered as "Gent.mo Sig." 
+or "Gent.ma Sig.ra" based on member sex.<br>
+To control message formatting, a template can include regular HTML formatting tag. To 
+create a new template, press "New template" below.
+
+</p>
+
+<a class="btn btn-success mb-3" href="{{ url_for('create_template') }}">New template</a>
+<table class="table table-bordered table-sm">
+  <thead class="table-light">
+    <tr><th>Name</th><th>Description</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for t in templates %}
+      <tr>
+        <td>{{ t[1] }}</td>
+        <td>{{ t[2] }}</td>
+        <td><a class="btn btn-sm btn-primary" href="{{ url_for('edit_template', template_id=t[0]) }}">Edit</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
