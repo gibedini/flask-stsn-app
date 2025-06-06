@@ -12,11 +12,24 @@
       {% endfor %}
     </select>
   </div>
+  
+  <div class="mb-3">
+  <label for="categoria" class="form-label">Categoria soci</label>
+  <select class="form-select" name="categoria" id="categoria" required>
+    <option value="tutti">Tutti</option>
+    <option value="regolare" {% if categoria == 'regolare' %}selected{% endif %}>Regolari</option>
+    <option value="moroso" {% if categoria == 'moroso' %}selected{% endif %}>Morosi</option>
+    <option value="decaduto" {% if categoria == 'decaduto' %}selected{% endif %}>Decaduti</option>
+  </select>
+</div>
+
+  
   <button class="btn btn-primary">Mostra anteprima</button>
 </form>
 {% if selected %}
 <form method="post" action="{{ url_for('export_lettere') }}">
   <input type="hidden" name="template" value="{{ selected }}">
+  <input type="hidden" name="categoria" value="{{ categoria }}">
   <button class="btn btn-success mt-3">Esporta in CSV</button>
 </form>
 {% endif %}

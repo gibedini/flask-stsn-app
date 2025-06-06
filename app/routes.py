@@ -615,7 +615,7 @@ def anteprima_lettera():
 
     cur.close()
     conn.close()
-    return render_template("letter_preview.html", templates=templates, anteprima=anteprima, selected=selected)
+    return render_template("letter_preview.html", templates=templates, anteprima=anteprima, selected=selected, categoria=request.form.get("categoria", "tutti"))
 
 @app.route("/lettere/export", methods=["POST"])
 @login_required
@@ -625,8 +625,10 @@ def export_lettere():
         return redirect(url_for("members"))
 
     selected = request.form.get("template")
+    categoria = request.form.get("categoria", "tutti")
     conn = get_connection()
     cur = conn.cursor()
+
 
     # Recupera template scelto
     cur.execute("SELECT content FROM message_templates WHERE name = %s", (selected,))
@@ -636,13 +638,17 @@ def export_lettere():
         return redirect(url_for("anteprima_lettera"))
     template = row[0]
 
-    # Recupera tutti i soci
-    cur.execute("SELECT member_id, surname, name, email, sex FROM members ORDER BY surname")
+    # Recupera i soci in base alla categoria
+    if categoria == "tutti":
+        cur.execute("SELECT member_id, surname, name, email, sex, stato FROM member_status ORDER BY surname")
+    else:
+        cur.execute("SELECT member_id, surname, name, email, sex, stato FROM member_status WHERE stato = %s ORDER BY surname", (categoria,))
+    
     members = cur.fetchall()
 
     messages = []
     for m in members:
-        member_id, surname, name, email, sex = m
+        member_id, surname, name, email, sex, stato = m
         titolo = "Gentile Sig.ra" if sex == "f" else "Gentile Sig."
 
         cur.execute("SELECT MAX(year) FROM subscriptions WHERE member_id = %s AND fee_paid = 'yes'", (member_id,))
@@ -659,14 +665,14 @@ def export_lettere():
             "a_debito": 35 * (datetime.now().year - last_paid)
         }
         msg = render_template_string(template, **context)
-        messages.append([email, name, surname, msg])
+        messages.append([email, name, surname, stato, msg])
 
     cur.close()
     conn.close()
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Email", "Nome", "Cognome", "Messaggio"])
+    writer.writerow(["Email", "Nome", "Cognome", "Stato","Messaggio"])
     writer.writerows(messages)
 
     return Response(
