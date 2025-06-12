@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Message template help{% endblock %}
+{% block content %}
+<h2>Message template help</h2>
+<p>Templates are regular text files with placeholders for database fields. 
+Enclose the desired database field in double curly parentheses 
+{{ '{{' }} <em>like this</em> {{ '}}' }} within the message text: it will then 
+be replaced by the actual field value in the rendered message.
+<br>
+Currently the following fields are recognized by the template renderer:
+<div class="narrow-table-left">
+<table class="table table-bordered table-sm">
+	<thead class="table-dark">
+		<tr><td>Field</td><td>Description</td></tr>
+	</thead>
+	<tbody>
+		<tr><td><i>titolo</i></td><td>name prefix, e.g. "Gent.mo Sig." or "Gent.ma Sig.ra"</td></tr>
+		<tr><td><i>nome</i></td><td>first name</td></tr>
+		<tr><td><i>cognome</i></td><td>last name</td></tr>
+		<tr><td><i>ultimo_anno</i></td><td>year of last subscription fee payment</td></tr>
+		<tr><td><i>anno da saldare</i></td><td>first year for which payment is due</td></tr>
+		<tr><td><i>a_debito</i></td><td>amount due, in Euros</td></tr>
+	</tbody>			
+</table>
+</p>
+<p>
+</div>
+<p><p>So, if you enter {{ '{{' }} titolo {{ '}}' }} in the template, 
+it will be rendered as "Gent.mo Sig." 
+or "Gent.ma Sig.ra" based on member sex.<br>
+To control message formatting, a template can include regular HTML formatting tag. To 
+create a new template, press the "New template" button.
+{% endblock %}

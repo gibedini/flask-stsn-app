@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
-{% block title %}Lettere personalizzate{% endblock %}
+{% block title %}Custom messages{% endblock %}
 {% block content %}
-<h2>Genera lettera da template</h2>
+<h2>Generate message from template</h2>
+<p class="mb-3">
+Select a template and a member category to generate custom messages based on the 
+selected template and addressed to the selected member category. You may then 
+download a CSV file for mailmerge by pressing the "download button".
+</p>
 <form method="post" class="mb-4">
+  <div class="narrow-table-left mb-3">
   <div class="mb-3">
-    <label for="template" class="form-label">Seleziona un template</label>
+    <label for="template" class="form-label">Select a template</label>
     <select class="form-select" name="template" id="template" required>
-      <option value="" disabled {% if not selected %}selected{% endif %}>-- scegli --</option>
+      <option value="" disabled {% if not selected %}selected{% endif %}>-- select --</option>
       {% for t in templates %}
         <option value="{{ t[0] }}" {% if t[0] == selected %}selected{% endif %}>{{ t[1] or t[0] }}</option>
       {% endfor %}
@@ -14,7 +20,7 @@
   </div>
   
   <div class="mb-3">
-  <label for="categoria" class="form-label">Categoria soci</label>
+  <label for="categoria" class="form-label">Member category</label>
   <select class="form-select" name="categoria" id="categoria" required>
     <option value="tutti">Tutti</option>
     <option value="regolare" {% if categoria == 'regolare' %}selected{% endif %}>Regolari</option>
@@ -22,15 +28,15 @@
     <option value="decaduto" {% if categoria == 'decaduto' %}selected{% endif %}>Decaduti</option>
   </select>
 </div>
-
+<div> 
   
-  <button class="btn btn-primary">Mostra anteprima</button>
+  <button class="btn btn-primary">Preview</button>
 </form>
 {% if selected %}
 <form method="post" action="{{ url_for('export_lettere') }}">
   <input type="hidden" name="template" value="{{ selected }}">
   <input type="hidden" name="categoria" value="{{ categoria }}">
-  <button class="btn btn-success mt-3">Esporta in CSV</button>
+  <button class="btn btn-success mt-3">Download CSV</button>
 </form>
 {% endif %}
 

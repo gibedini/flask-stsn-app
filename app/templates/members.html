@@ -2,12 +2,20 @@
 {% block title %}All Members{% endblock %}
 {% block content %}
 <h1 class="mb-4">All Members</h1>
+<p>
+Type a name or email in the <i>search</i> field and press the blue "Search" button to 
+search by name or email.<br>
+Click on ID number to edit member's data and subscription details.
+
+<div class="narrow-table-left">
+
 <form method="get" class="mb-3">
     <div class="input-group">
         <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by name or email">
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
+
 {% if current_user.is_authenticated %}
   {% if current_user.role in ['admin', 'editor'] %}
 
@@ -15,6 +23,9 @@
 
   {% endif %}
 {% endif %}
+
+</div>
+
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>

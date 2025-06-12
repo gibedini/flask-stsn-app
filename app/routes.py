@@ -499,7 +499,7 @@ def export_missing_fees():
 @app.route("/templates")
 @login_required
 def list_templates():
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Solo gli amministratori possono modificare i template.", "danger")
         return redirect(url_for("members"))
     conn = get_connection()
@@ -513,14 +513,15 @@ def list_templates():
 @app.route("/templates/<int:template_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_template(template_id):
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Solo gli amministratori possono modificare i template.", "danger")
         return redirect(url_for("members"))
     conn = get_connection()
     cur = conn.cursor()
     if request.method == "POST":
+        description = request.form["description"]
         content = request.form["content"]
-        cur.execute("UPDATE message_templates SET content = %s WHERE id = %s", (content, template_id))
+        cur.execute("UPDATE message_templates SET description = %s, content = %s WHERE id = %s", (description, content, template_id))
         conn.commit()
         flash("Template aggiornato.", "success")
         return redirect(url_for("list_templates"))
@@ -533,7 +534,7 @@ def edit_template(template_id):
 @app.route("/templates/new", methods=["GET", "POST"])
 @login_required
 def create_template():
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Solo gli amministratori possono creare template.", "danger")
         return redirect(url_for("members"))
     if request.method == "POST":
@@ -556,7 +557,7 @@ def create_template():
 @app.route("/templates/<int:template_id>/preview")
 @login_required
 def preview_template(template_id):
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Solo gli amministratori possono visualizzare l'anteprima dei template.", "danger")
         return redirect(url_for("members"))
     conn = get_connection()
@@ -580,11 +581,18 @@ def preview_template(template_id):
     }
     anteprima = render_template_string(template, **context)
     return render_template("preview_template.html", anteprima=anteprima)
+    
+
+@app.route("/templates/help")
+@login_required
+def help_template():
+    return render_template("help_template.html")
+    
 
 @app.route("/lettere/anteprima", methods=["GET", "POST"])
 @login_required
 def anteprima_lettera():
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Accesso riservato agli amministratori.", "danger")
         return redirect(url_for("members"))
 
@@ -620,7 +628,7 @@ def anteprima_lettera():
 @app.route("/lettere/export", methods=["POST"])
 @login_required
 def export_lettere():
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != 'editor':
         flash("Accesso riservato agli amministratori.", "danger")
         return redirect(url_for("members"))
 
