@@ -43,7 +43,8 @@ download a CSV file for mailmerge by pressing the "download button".
 {% if anteprima %}
   <div class="card">
     <div class="card-body">
-      <pre>{{ anteprima }}</pre>
+      <!--pre>{{ anteprima | safe }}</pre-->
+      {{ anteprima | safe }}
     </div>
   </div>
 {% endif %}

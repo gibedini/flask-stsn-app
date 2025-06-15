@@ -553,40 +553,45 @@ def create_template():
         return redirect(url_for("list_templates"))
     return render_template("create_template.html")
 
- 
-@app.route("/templates/<int:template_id>/preview")
-@login_required
-def preview_template(template_id):
-    if current_user.role != "admin" and current_user.role != 'editor':
-        flash("Solo gli amministratori possono visualizzare l'anteprima dei template.", "danger")
-        return redirect(url_for("members"))
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT content FROM message_templates WHERE id = %s", (template_id,))
-    row = cur.fetchone()
-    cur.close()
-    conn.close()
-    if not row:
-        return "Template non trovato", 404
 
-    template = row[0]
-    context = {
-        "titolo": "Gentile Sig.",
-        "nome": "Mario",
-        "cognome": "Rossi",
-        "ultimo_anno": 2023,
-        "anno_da_saldare": 2024,
-        "stato": "moroso",
-        "a_debito": 70
-    }
-    anteprima = render_template_string(template, **context)
-    return render_template("preview_template.html", anteprima=anteprima)
     
 
 @app.route("/templates/help")
 @login_required
 def help_template():
     return render_template("help_template.html")
+    
+  
+# Route for styled preview of a message template (HTML rendering)
+@app.route("/templates/<int:template_id>/preview")
+@login_required
+def preview_template(template_id):
+    if current_user.role != "admin" and current_user.role != 'editor':
+        flash("Solo gli amministratori possono visualizzare l'anteprima.", "danger")
+        return redirect(url_for("members"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT name, description, content FROM message_templates WHERE id = %s", (template_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not row:
+        return "Template non trovato", 404
+
+    name, description, template = row
+    context = {
+        "titolo": "Gentile Sig.",
+        "nome": "Giuseppe",
+        "cognome": "Verdi",
+        "stato": "moroso",
+        "a_debito": 70,
+        "anno_da_saldare": 2023,
+        "ultimo_anno": 2021
+    }
+    rendered_html = render_template_string(template, **context)
+    return render_template("preview.html", rendered_html=rendered_html, name=name, description=description)
     
 
 @app.route("/lettere/anteprima", methods=["GET", "POST"])
@@ -688,7 +693,7 @@ def export_lettere():
         mimetype="text/csv",
         headers={"Content-Disposition": f"attachment; filename={selected}_lettere.csv"}
     )
-  
+
 
 @app.route("/")
 def index():
