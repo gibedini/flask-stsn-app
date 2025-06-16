@@ -162,14 +162,15 @@ def add_member():
         email = request.form["email"]
         street_address = request.form["street_address"]
         year_joined = request.form["year_joined"]
+        memorie = request.form["memorie"]
 
         try:
             conn = get_connection()
             cur = conn.cursor()
             cur.execute("""
-                INSERT INTO members (surname, name, email, street_address, year_joined)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (surname, name, email, street_address, year_joined))
+                INSERT INTO members (surname, name, email, street_address, year_joined, memorie)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (surname, name, email, street_address, year_joined, memorie))
             conn.commit()
             flash("Socio aggiunto con successo", "success")
         except IntegrityError:
@@ -189,7 +190,7 @@ def member_detail(member_id):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT member_id, surname, name, email, street_address, year_joined, stato
+        SELECT member_id, surname, name, email, street_address, year_joined, memorie, stato
         FROM member_status
         WHERE member_id = %s
     """, (member_id,))
@@ -226,13 +227,14 @@ def edit_member(member_id):
         email = request.form["email"]
         street_address = request.form["street_address"]
         year_joined = request.form["year_joined"]
+        memorie = request.form["memorie"]
 
         try:
             cur.execute("""
                 UPDATE members
-                SET surname = %s, name = %s, email = %s, street_address = %s, year_joined = %s
+                SET surname = %s, name = %s, email = %s, street_address = %s, year_joined = %s, memorie = %s
                 WHERE member_id = %s
-            """, (surname, name, email, street_address, year_joined, member_id))
+            """, (surname, name, email, street_address, year_joined, memorie, member_id))
             conn.commit()
             flash("Dati del socio aggiornati", "success")
         except IntegrityError:
@@ -244,7 +246,7 @@ def edit_member(member_id):
         return redirect(url_for("members"))
 
     cur.execute("""
-        SELECT surname, name, email, street_address, year_joined
+        SELECT surname, name, email, street_address, year_joined, memorie 
         FROM members WHERE member_id = %s
     """, (member_id,))
     member = cur.fetchone()
@@ -350,8 +352,8 @@ def delete_member(member_id):
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO archived_members (member_id, surname, name, email, street_address, year_joined, deletion_date)
-        SELECT member_id, surname, name, email, street_address, year_joined, %s
+        INSERT INTO archived_members (member_id, surname, name, email, street_address, year_joined, memorie, deletion_date)
+        SELECT member_id, surname, name, email, street_address, year_joined, memorie, %s
         FROM members WHERE member_id = %s
     """, (today, member_id))
 
@@ -588,7 +590,8 @@ def preview_template(template_id):
         "stato": "moroso",
         "a_debito": 70,
         "anno_da_saldare": 2023,
-        "ultimo_anno": 2021
+        "ultimo_anno": 2021,
+        "memorie": "A"
     }
     rendered_html = render_template_string(template, **context)
     return render_template("preview.html", rendered_html=rendered_html, name=name, description=description)
@@ -653,9 +656,9 @@ def export_lettere():
 
     # Recupera i soci in base alla categoria
     if categoria == "tutti":
-        cur.execute("SELECT member_id, surname, name, email, sex, stato FROM member_status ORDER BY surname")
+        cur.execute("SELECT member_id, surname, name, email, sex, memorie, stato FROM member_status ORDER BY surname")
     else:
-        cur.execute("SELECT member_id, surname, name, email, sex, stato FROM member_status WHERE stato = %s ORDER BY surname", (categoria,))
+        cur.execute("SELECT member_id, surname, name, email, sex, memorie, stato FROM member_status WHERE stato = %s ORDER BY surname", (categoria,))
     
     members = cur.fetchall()
 
@@ -672,10 +675,11 @@ def export_lettere():
             "titolo": titolo,
             "nome": name,
             "cognome": surname,
-            "stato": "regolare",
+            "stato": stato,
             "ultimo_anno": last_paid,
             "anno_da_saldare": start_due,
-            "a_debito": 35 * (datetime.now().year - last_paid)
+            "a_debito": 35 * (datetime.now().year - last_paid),
+            "memorie": memorie
         }
         msg = render_template_string(template, **context)
         messages.append([email, name, surname, stato, msg])
