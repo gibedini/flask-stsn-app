@@ -664,7 +664,7 @@ def export_lettere():
 
     messages = []
     for m in members:
-        member_id, surname, name, email, sex, stato = m
+        member_id, surname, name, email, sex, memorie, stato = m
         titolo = "Gentile Sig.ra" if sex == "f" else "Gentile Sig."
 
         cur.execute("SELECT MAX(year) FROM subscriptions WHERE member_id = %s AND fee_paid = 'yes'", (member_id,))
