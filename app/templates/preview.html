@@ -4,7 +4,7 @@
 <h2>Message {{ name }}: Preview</h2>
 <p class="text-muted">{{ description }}</p>
 <div class="border p-3 bg-white shadow-sm">
-  {{ rendered_html | safe }}
+  <pre>{{ rendered_html }}</pre>
 </div>
 <a class="btn btn-secondary mt-3" href="{{ url_for('list_templates') }}">Back to templates</a>
 {% endblock %}

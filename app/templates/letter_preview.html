@@ -24,7 +24,8 @@ download a CSV file for mailmerge by pressing the "download button".
   <select class="form-select" name="categoria" id="categoria" required>
     <option value="tutti">Tutti</option>
     <option value="regolare" {% if categoria == 'regolare' %}selected{% endif %}>Regolari</option>
-    <option value="moroso" {% if categoria == 'moroso' %}selected{% endif %}>Morosi</option>
+    <option value="moroso_uno" {% if categoria == 'moroso_uno' %}selected{% endif %}>Morosi di un anno</option>
+    <option value="moroso_due" {% if categoria == 'moroso_due' %}selected{% endif %}>Morosi di due anni</option>
     <option value="decaduto" {% if categoria == 'decaduto' %}selected{% endif %}>Decaduti</option>
   </select>
 </div>
